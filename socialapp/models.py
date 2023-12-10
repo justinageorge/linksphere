@@ -2,16 +2,17 @@ from django.db import models
 from django.contrib.auth.models import User
 from datetime import datetime
 from django.utils import timezone
+from django.db.models.signals import post_save
 
 class UserProfile(models.Model):
-    user=models.OneToOneField(User,on_delete=models.CASCADE,related_name="profile")
-    address=models.CharField(max_length=200)
-    phone=models.CharField(max_length=200)
+    user=models.OneToOneField(User,on_delete=models.CASCADE,related_name="profile",null=True)
+    address=models.CharField(max_length=200,null=True)
+    phone=models.CharField(max_length=200,null=True)
     profile_pic=models.ImageField(upload_to="profilepics",null=True,blank=True)#null is for data base and blank is for form so that it will not be included in form
-    dob=models.DateField()
-    bio=models.CharField(max_length=200)
-    following=models.ManyToManyField("self",related_name="followed_by",symmetrical=False)#there is no need of someone to follow back
-    block=models.ManyToManyField("self",related_name="blocked", symmetrical=False)
+    dob=models.DateField(null=True)
+    bio=models.CharField(max_length=200,null=True)
+    following=models.ManyToManyField("self",related_name="followed_by",symmetrical=False,null=True)#there is no need of someone to follow back
+    block=models.ManyToManyField("self",related_name="blocked", symmetrical=False,null=True)
 
     def __str__(self):
         return self.user.username #we are goimg from userprofile to usermodel ie to print the profile name
@@ -40,8 +41,17 @@ class stories(models.Model):
     user=models.ForeignKey(User,on_delete=models.CASCADE,related_name="userstories")
     title=models.CharField(max_length=200)
     post_image=models.ImageField(upload_to="stories",null=True,blank=True)
-    created_date=models.DateTimeField(auto_now_add=True)
-    exp=created_date+timezone.timedelta(days=1)
-    expiry_date=models.DateTimeField(exp)
+    created_date=models.DateTimeField(auto_now_add=True) #to set date automatically auto_now_add
+    # exp=created_date+timezone.timedelta(days=1)
+    expiry_date=models.DateTimeField()#to generate query file we apply make migrations and to run the file we apply makemigrate
    
+    def __str__(self):
+        return self.title
+        
+#python manage.py makemigrations
+#python manage.py migrate
 
+def create_profile(sender,created,instance,**kwargs):
+    if created:
+         UserProfile.objects.create(user=instance)
+post_save.connect(create_profile,sender=User)         

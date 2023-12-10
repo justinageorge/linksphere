@@ -1,0 +1,71 @@
+open folder take cmd
+new environment creation
+python -m virtualenv env
+to activate new environment
+env\Scripts\activat.bat
+installing modules
+pip install django pillow
+new project creation
+django-admin startproject linksphere(open project linksphere in vscode)
+to tell the virtual environment to vs code(ctr+shift+p python:select interpreter enter interpreterpath find /env /scripts/ python )
+in cmd
+python manage.py startapp socialapp
+add socialapp in installed apps
+take models of social app
+models
+from djanfgo.contrib.auth import User
+class UserProfile(models.Model):
+    user=models.oneToOneField(User,on_delete=models.CASCADE,related_name="profile")
+    address=models.CharField(max_length=200)
+    phone=models.CharField(max_length=200)
+    profilepics=models.ImageField(upload_to="profilepics",null=True,blank=True)
+    dob=models.DateField()
+    bio=models.CharField(max_length=200)
+    following=models.manyToManyField(User,related_name="followed_by",symmetrical=False)
+    block=models.manyToManyField(User,related_name="blocked",symmetrical="False")
+    def__str__(self):
+        return self.user.username
+class Posts(models.Model):
+    user=models.ForeignKey(User,on_delete=models.CASCADE,related_name="coverpost")     
+    title=models.CharField(max_length=200)  
+    post_image=models.ImageField(upload_to="coverpics",null=True,blank=True) 
+    created_date=models.DateTimeField(auto_now_add=True)
+    liked_by=models.manyToManyField(User,related_name="liked",symmetrical=False)
+
+    def __str__(self):
+        return self.title
+
+class Comments(models.Model):
+    user=models.ForeignKey(User,related_name="comment",on_delete=models.CASCADE)
+    text=models.CharField(max_length=200)
+
+
+
+git commands
+git init
+git add -A 
+git commit -m"mess"
+git branch
+git push origin master
+
+
+
+after making migrations create template and forms
+forms .py in social
+templates folder in-social app
+write click on social app reveal in file explorer open socialapp create a folder static and cretae a new folder social(as there is chances to have other css and images files in the static folder)
+in that css staic js assets
+
+we created registration form
+
+models signals
+obj:we have to create userobject when an profile is created
+first we have to import signals
+sender means-the model in which we are creating object so that create profile works
+created-object created or not(boolean value true or false)
+instance=which object created there
+userprofile.objects.create(user=instance) creating new userprofile
+we haveto connect post_save and method-createprofile(we need sender and receiver)
+
+
+view creation
