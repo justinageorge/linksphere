@@ -47,7 +47,12 @@ class stories(models.Model):
    
     def __str__(self):
         return self.title
-        
+
+
+    def save(self,*args,**kwargs):
+        if not self.expiry_date:
+            self.expiry_date=timezone.now()+timezone.timedelta(days=1)
+        super().save(*args,**kwargs)    
 #python manage.py makemigrations
 #python manage.py migrate
 
@@ -55,3 +60,6 @@ def create_profile(sender,created,instance,**kwargs):
     if created:
          UserProfile.objects.create(user=instance)
 post_save.connect(create_profile,sender=User)         
+
+
+
